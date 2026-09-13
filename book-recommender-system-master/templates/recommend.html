@@ -1,0 +1,603 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BookPilot — Recommendations</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(124, 58, 237, 0.18),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 80%,
+                    rgba(236, 72, 153, 0.12),
+                    transparent 30%
+                ),
+                #09090b;
+
+            color: white;
+            font-family: "DM Sans", sans-serif;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7%;
+            background: rgba(9, 9, 11, 0.75);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: "Playfair Display", serif;
+            font-size: 25px;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #a855f7;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #a1a1aa;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover,
+        .nav-links .active {
+            color: white;
+            background: rgba(168, 85, 247, 0.15);
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+            padding: 70px 20px 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 15px;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            background: rgba(168, 85, 247, 0.1);
+            color: #c084fc;
+            border-radius: 30px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: "Playfair Display", serif;
+            font-size: clamp(42px, 6vw, 68px);
+            line-height: 1.05;
+            margin-bottom: 18px;
+            background: linear-gradient(90deg, #ffffff, #d8b4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: #a1a1aa;
+            font-size: 17px;
+            max-width: 600px;
+            margin: auto;
+            line-height: 1.7;
+        }
+
+        /* MAIN */
+
+        .container {
+            width: 86%;
+            max-width: 1200px;
+            margin: auto;
+            padding-bottom: 80px;
+        }
+
+        /* SEARCH */
+
+        .search-box {
+            max-width: 800px;
+            margin: 10px auto 65px;
+            padding: 28px;
+            background: rgba(24, 24, 27, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .search-box label {
+            display: block;
+            color: #d4d4d8;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            height: 55px;
+            padding: 0 18px;
+            border: 1px solid #3f3f46;
+            border-radius: 12px;
+            outline: none;
+            background: #18181b;
+            color: white;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: #71717a;
+        }
+
+        .search-input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.12);
+        }
+
+        .recommend-btn {
+            height: 55px;
+            padding: 0 27px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #9333ea, #c026d3);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .recommend-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        /* ERROR */
+
+        .error-message {
+            max-width: 800px;
+            margin: -45px auto 50px;
+            padding: 16px 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            color: #fca5a5;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* RESULTS */
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .results-header h2 {
+            font-family: "Playfair Display", serif;
+            font-size: 30px;
+        }
+
+        .results-header span {
+            color: #71717a;
+            font-size: 14px;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 28px;
+        }
+
+        /* BOOK CARD */
+
+        .book-card {
+            background: rgba(24, 24, 27, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: 0.35s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-9px);
+            border-color: rgba(168, 85, 247, 0.45);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+        }
+
+        .book-image {
+            height: 310px;
+            overflow: hidden;
+            background: #18181b;
+        }
+
+        .book-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .book-card:hover .book-image img {
+            transform: scale(1.06);
+        }
+
+        .book-info {
+            padding: 18px;
+        }
+
+        .book-title {
+            font-family: "Playfair Display", serif;
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.35;
+            margin-bottom: 8px;
+
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .author {
+            color: #a1a1aa;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* EMPTY */
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #71717a;
+        }
+
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .empty h3 {
+            color: #d4d4d8;
+            font-family: "Playfair Display", serif;
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            text-align: center;
+            padding: 25px;
+            color: #52525b;
+            font-size: 13px;
+        }
+
+        /* TABLET */
+
+        @media (max-width: 1000px) {
+
+            .book-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            nav {
+                padding: 0 5%;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .nav-links a {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .container {
+                width: 90%;
+            }
+
+            .hero {
+                padding-top: 55px;
+            }
+
+            .search-box {
+                padding: 20px;
+            }
+
+            .search-row {
+                flex-direction: column;
+            }
+
+            .recommend-btn {
+                width: 100%;
+            }
+
+            .book-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .book-image {
+                height: 240px;
+            }
+
+            .book-info {
+                padding: 13px;
+            }
+
+            .book-title {
+                font-size: 16px;
+            }
+
+            .author {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 450px) {
+
+            .book-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .book-image {
+                height: 320px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav>
+
+        <a href="/" class="logo">
+            Book<span>Pilot</span>
+        </a>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="/">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="/recommend" class="active">
+                    Recommend
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="badge">
+            ✦ Personalized recommendations
+        </div>
+
+        <h1>
+            Find your next<br>
+            great read.
+        </h1>
+
+        <p>
+            Enter a book you love and discover
+            four books that you might enjoy.
+        </p>
+
+    </section>
+
+
+    <!-- MAIN -->
+
+    <main class="container">
+
+        <!-- SEARCH FORM -->
+
+        <form
+            action="/recommend_books"
+            method="POST"
+            class="search-box"
+        >
+
+            <label for="book">
+                Enter a book title
+            </label>
+
+            <div class="search-row">
+
+                <input
+                    id="book"
+                    name="user_input"
+                    type="text"
+                    class="search-input"
+                    placeholder="e.g. Harry Potter and the Order of the Phoenix"
+                    autocomplete="off"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="recommend-btn"
+                >
+                    ✨ Recommend
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <!-- ERROR -->
+
+        {% if error %}
+
+        <div class="error-message">
+            ⚠️ {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <!-- RESULTS -->
+
+        {% if data %}
+
+        <div class="results-header">
+
+            <h2>
+                You might also like
+            </h2>
+
+            <span>
+                {{ data|length }} recommendations
+            </span>
+
+        </div>
+
+
+        <div class="book-grid">
+
+            {% for i in data %}
+
+            <div class="book-card">
+
+                <div class="book-image">
+
+                    <img
+                        src="{{ i[2] }}"
+                        alt="{{ i[0] }}"
+                        loading="lazy"
+                        onerror="this.style.display='none'"
+                    >
+
+                </div>
+
+                <div class="book-info">
+
+                    <div class="book-title">
+                        {{ i[0] }}
+                    </div>
+
+                    <div class="author">
+                        {{ i[1] }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                📚
+            </div>
+
+            <h3>
+                Your recommendations are waiting
+            </h3>
+
+            <p>
+                Enter a book above to discover
+                similar books.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+        © 2026 BookPilot · Made for book lovers
+    </footer>
+
+</body>
+
+</html>
+```
