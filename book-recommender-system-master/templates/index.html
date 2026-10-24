@@ -186,6 +186,24 @@
             transform: scale(1.06);
         }
 
+        .cover-fallback {
+            display: none;
+            height: 100%;
+            padding: 22px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: 1.15rem;
+            line-height: 1.35;
+            color: #d8c8ff;
+            background: linear-gradient(145deg, #231b3a, #18181b);
+        }
+
+        .book-image.no-cover .cover-fallback {
+            display: flex;
+        }
+
         .book-info {
             padding: 18px;
         }
@@ -384,13 +402,17 @@
 
             <div class="book-card">
 
-                <div class="book-image">
+                <div class="book-image{% if not image[i] %} no-cover{% endif %}">
 
+                    {% if image[i] %}
                     <img
                         src="{{ image[i] }}"
                         alt="{{ book_name[i] }}"
                         loading="lazy"
+                        onerror="this.parentElement.classList.add('no-cover'); this.remove()"
                     >
+                    {% endif %}
+                    <span class="cover-fallback">{{ book_name[i] }}</span>
 
                 </div>
 
