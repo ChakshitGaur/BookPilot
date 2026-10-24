@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import pickle
+import re
 import numpy as np
 from pathlib import Path
 
@@ -24,13 +25,23 @@ app = Flask(__name__)
 
 
 def clean_image_url(url):
+    """Return a working cover address for a book.
+
+    The dataset's own cover links (images.amazon.com) no longer work, so the
+    ISBN is taken from them and the cover is fetched from Open Library instead.
+    An empty string means no cover, and the page shows the title on a tile.
+    """
     url = str(url)
 
     if "](" in url:
         url = url.split("](")[1]
         url = url.rstrip(")")
 
-    return url
+    match = re.search(r"/P/(\d{9}[\dXx])", url)
+    if not match:
+        return ""
+
+    return f"https://covers.openlibrary.org/b/isbn/{match.group(1).upper()}-L.jpg?default=false"
 
 
 @app.route("/")
